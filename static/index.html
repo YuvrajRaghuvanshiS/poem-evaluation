@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hindi Poem Evaluation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:ital@0;1&family=Noto+Serif+Devanagari:wght@400;600;700&family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    /* ── Variables ── */
+    :root {
+      --bg: #faf8f4;
+      --surface: #ffffff;
+      --border: #e2ddd6;
+      --text: #1a1714;
+      --muted: #7a736a;
+      --accent: #b5451b;
+      --accent-l: #f5ede9;
+      --gold: #c9943a;
+      --gold-l: #fdf6e8;
+      --shadow: 0 2px 12px rgba(0, 0, 0, .07);
+      --radius: 10px;
+      --hi-bg: #fff3b0;
+      --hi-border: #e6c847;
+      --star-on: #c9943a;
+      --star-off: #d9d2c8;
+
+      /* Annotation colour palette — 6 distinct colours for overlapping spans */
+      --ann-0-bg: #fff3b0;
+      --ann-0-bd: #d4b800;
+      /* yellow  */
+      --ann-1-bg: #d4edff;
+      --ann-1-bd: #4a9fd4;
+      /* sky     */
+      --ann-2-bg: #d4f7e0;
+      --ann-2-bd: #3aad6a;
+      /* mint    */
+      --ann-3-bg: #ffdde8;
+      --ann-3-bd: #d4517a;
+      /* rose    */
+      --ann-4-bg: #ecdcff;
+      --ann-4-bd: #8b5cd4;
+      /* lavender*/
+      --ann-5-bg: #ffe8cc;
+      --ann-5-bd: #d47a20;
+      /* peach   */
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--text);
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    header .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      letter-spacing: .02em;
+    }
+
+    header .sub {
+      font-size: .8rem;
+      color: #b0a898;
+      margin-top: 2px;
+    }
+
+    header .badge {
+      margin-left: auto;
+      background: rgba(255, 255, 255, .1);
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: .78rem;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    header .badge:hover {
+      background: rgba(255, 255, 255, .18);
+    }
+
+    #evaluator-display {
+      font-size: .82rem;
+      color: #c8bfb5;
+    }
+
+    /* ── Identity screen ── */
+    #identity-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 64px);
+      padding: 40px 20px;
+    }
+
+    .identity-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: var(--shadow);
+    }
+
+    .identity-card h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.7rem;
+      margin-bottom: 6px;
+    }
+
+    .identity-card p {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: .95rem;
+      font-family: inherit;
+      background: var(--bg);
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-l);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      margin-top: 4px;
+    }
+
+    .btn-primary:hover {
+      background: #9a3a16;
+    }
+
+    .btn-primary:active {
+      transform: scale(.98);
+    }
+
+    .btn-primary:disabled {
+      background: #c0b8b0;
+      cursor: not-allowed;
+    }
+
+    /* ── Eval screen ── */
+    #eval-screen {
+      display: none;
+      padding: 28px 24px 80px;
+    }
+
+    .session-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .session-bar .artist-label {
+      font-family: 'Noto Serif Devanagari', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* ── Annotation instruction banner ── */
+    #ann-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #fffbf0;
+      border: 1.5px solid #e8c96a;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(201, 148, 58, .12);
+    }
+
+    #ann-banner .banner-icon {
+      font-size: 1.7rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    #ann-banner .banner-body {
+      flex: 1;
+    }
+
+    #ann-banner .banner-title {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    #ann-banner .banner-desc {
+      font-size: .83rem;
+      color: #5a5048;
+      line-height: 1.6;
+    }
+
+    #ann-banner .banner-desc strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    #ann-banner .banner-steps {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    #ann-banner .banner-step {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: .8rem;
+      color: #5a5048;
+      background: rgba(255, 255, 255, .7);
+      border: 1px solid #e8c96a;
+      border-radius: 20px;
+      padding: 5px 12px;
+    }
+
+    #ann-banner .banner-step .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #fff;
+      font-size: .68rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    #ann-banner .banner-dismiss {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #b0a07a;
+      font-size: 1.1rem;
+      padding: 2px 4px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: color .15s;
+    }
+
+    #ann-banner .banner-dismiss:hover {
+      color: var(--accent);
+    }
+
+    /* ── Poem columns ── */
+    .poems-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .poem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+    }
+
+    .poem-card-header {
+      background: var(--text);
+      color: #fff;
+      padding: 10px 14px;
+      font-size: .8rem;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .poem-body {
+      padding: 16px;
+      font-family: 'Tiro Devanagari Hindi', serif;
+      font-size: .93rem;
+      line-height: 2;
+      color: var(--text);
+      white-space: pre-wrap;
+      user-select: text;
+      cursor: text;
+      flex: 1;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .poem-body ::selection {
+      background: var(--hi-bg);
+    }
+
+    /* Pending selection highlight (before annotation is saved) */
+    mark.ann-pending {
+      background: rgba(180, 180, 180, .28);
+      border-bottom: 2px dashed #999;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    /* Saved annotation highlights — one class per colour slot */
+    mark.ann-highlight {
+      cursor: pointer;
+      border-radius: 2px;
+      padding: 0 1px;
+      position: relative;
+      border-bottom-width: 2px;
+      border-bottom-style: solid;
+      transition: filter .15s;
+    }
+
+    mark.ann-highlight:hover {
+      filter: brightness(.93);
+    }
+
+    mark.ann-c0 {
+      background: var(--ann-0-bg);
+      border-bottom-color: var(--ann-0-bd);
+    }
+
+    mark.ann-c1 {
+      background: var(--ann-1-bg);
+      border-bottom-color: var(--ann-1-bd);
+    }
+
+    mark.ann-c2 {
+      background: var(--ann-2-bg);
+      border-bottom-color: var(--ann-2-bd);
+    }
+
+    mark.ann-c3 {
+      background: var(--ann-3-bg);
+      border-bottom-color: var(--ann-3-bd);
+    }
+
+    mark.ann-c4 {
+      background: var(--ann-4-bg);
+      border-bottom-color: var(--ann-4-bd);
+    }
+
+    mark.ann-c5 {
+      background: var(--ann-5-bg);
+      border-bottom-color: var(--ann-5-bd);
+    }
+
+    /* Colour dot badge shown in annotation list items */
+    .ann-colour-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 5px;
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+
+    /* Tooltip on hover for saved highlights */
+    mark.ann-highlight:hover::after {
+      content: attr(data-comment);
+      position: absolute;
+      left: 0;
+      top: 100%;
+      background: var(--text);
+      color: #fff;
+      font-size: .76rem;
+      font-family: 'DM Sans', sans-serif;
+      padding: 6px 10px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      max-width: 220px;
+      z-index: 100;
+      line-height: 1.5;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .3);
+      pointer-events: none;
+    }
+
+    /* ── Annotation tooltip popup ── */
+    #ann-popup {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .18);
+      padding: 14px;
+      width: 260px;
+    }
+
+    #ann-popup p {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    #ann-popup textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      font-size: .83rem;
+      font-family: inherit;
+      resize: none;
+      height: 72px;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    #ann-popup textarea:focus {
+      border-color: var(--accent);
+    }
+
+    #ann-popup .popup-btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    #ann-popup .popup-btns button {
+      flex: 1;
+      padding: 7px;
+      border: none;
+      border-radius: 6px;
+      font-size: .8rem;
+      font-family: inherit;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    #ann-save {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    #ann-save:hover {
+      background: #9a3a16;
+    }
+
+    #ann-cancel {
+      background: var(--bg);
+      color: var(--muted);
+      border: 1px solid var(--border) !important;
+    }
+
+    /* ── Ratings section ── */
+    .ratings-section {
+      padding: 14px 16px;
+    }
+
+    .ratings-section h4 {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .rating-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 7px;
+    }
+
+    .rating-row .label {
+      font-size: .8rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: default;
+    }
+
+    /* Info icon for rating criteria — tooltip is JS-driven to avoid clipping */
+    .criterion-info {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      background: var(--border);
+      color: var(--muted);
+      border-radius: 50%;
+      font-size: .62rem;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: default;
+      flex-shrink: 0;
+      transition: background .15s;
+    }
+
+    .criterion-info:hover {
+      background: #c8bfb5;
+    }
+
+    /* Floating popover — positioned via JS, attached to <body> */
+    #criterion-popover {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      background: var(--text);
+      color: #fff;
+      font-size: .78rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+      padding: 10px 13px;
+      border-radius: 8px;
+      width: 220px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, .32);
+      pointer-events: none;
+    }
+
+    #criterion-popover strong {
+      display: block;
+      font-size: .8rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #f0ebe5;
+    }
+
+    #criterion-popover .pop-arrow {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border: 6px solid transparent;
+    }
+
+    #criterion-popover .pop-arrow.arrow-down {
+      border-top-color: var(--text);
+      top: 100%;
+    }
+
+    #criterion-popover .pop-arrow.arrow-up {
+      border-bottom-color: var(--text);
+      bottom: 100%;
+    }
+
+    #criterion-popover .pop-arrow.arrow-right {
+      border-left-color: var(--text);
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .stars {
+      display: flex;
+      gap: 3px;
+    }
+
+    .star {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      color: var(--star-off);
+      transition: color .15s, transform .1s;
+      user-select: none;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .star:hover,
+    .star.on {
+      color: var(--star-on);
+    }
+
+    .star:active {
+      transform: scale(.85);
+    }
+
+
+
+    /* ── Annotations list ── */
+    .ann-list {
+      padding: 0 16px 14px;
+    }
+
+    .ann-list-title {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .ann-item {
+      background: var(--gold-l);
+      border: 1px solid #e8d5a0;
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      font-size: .78rem;
+      position: relative;
+    }
+
+    .ann-item .ann-text {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-family: 'Tiro Devanagari Hindi', serif;
+      font-size: .82rem;
+    }
+
+    .ann-item .ann-comment {
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .ann-delete {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 2px;
+      line-height: 1;
+    }
+
+    .ann-delete:hover {
+      color: var(--accent);
+    }
+
+    /* ── Submit bar ── */
+    .submit-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 -4px 24px rgba(0, 0, 0, .08);
+      z-index: 200;
+    }
+
+    .progress-info {
+      font-size: .83rem;
+      color: var(--muted);
+      flex: 1;
+    }
+
+    .progress-bar {
+      width: 200px;
+      height: 5px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width .3s;
+      width: 0%;
+    }
+
+    .btn-submit {
+      padding: 11px 32px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: .93rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .btn-submit:disabled {
+      background: #c0b8b0;
+      cursor: not-allowed;
+    }
+
+    .btn-submit:not(:disabled):hover {
+      background: #9a3a16;
+    }
+
+    /* ── Confirmation screen ── */
+    #confirm-screen {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 64px);
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .confirm-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 52px 48px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: var(--shadow);
+    }
+
+    .confirm-icon {
+      font-size: 3.5rem;
+      margin-bottom: 16px;
+    }
+
+    .confirm-card h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    .confirm-card p {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .btn-next {
+      padding: 13px 32px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .btn-next:hover {
+      background: #9a3a16;
+    }
+
+    /* ── Responsive: allow horizontal scroll on small screens ── */
+    @media (max-width: 1100px) {
+      .poems-grid {
+        grid-template-columns: repeat(5, minmax(260px, 1fr));
+        overflow-x: auto;
+      }
+
+      #eval-screen {
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ HEADER ══ -->
+  <header>
+    <div>
+      <div class="logo">Hindi Poem Evaluation</div>
+      <div class="sub">Thesis Research · IIT</div>
+    </div>
+    <div id="evaluator-display"></div>
+    <div class="badge" id="change-user-btn" style="display:none">Change Evaluator</div>
+  </header>
+
+  <!-- ══ IDENTITY SCREEN ══ -->
+  <div id="identity-screen">
+    <div class="identity-card">
+      <h2>Welcome</h2>
+      <p>You are helping evaluate AI-generated Hindi poetry. Please enter your details to begin. Your information will
+        be saved locally so you don't need to re-enter it.</p>
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="inp-name" placeholder="आपका नाम" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="inp-email" placeholder="you@example.com" autocomplete="email" />
+      </div>
+      <button class="btn-primary" id="start-btn" disabled>Start Evaluating →</button>
+    </div>
+  </div>
+
+  <!-- ══ EVALUATION SCREEN ══ -->
+  <div id="eval-screen">
+    <div class="session-bar">
+      <span>Evaluating poems in the style of</span>
+      <span class="artist-label" id="artist-name-display"></span>
+    </div>
+
+    <!-- Annotation instruction banner — shown until dismissed -->
+    <div id="ann-banner">
+      <div class="banner-icon">✍️</div>
+      <div class="banner-body">
+        <div class="banner-title">You can annotate specific parts of each poem</div>
+        <div class="banner-desc">
+          While reading, <strong>select (highlight) any text</strong> in a poem — a popup will let you attach a comment
+          to that passage. This helps explain your ratings and is <strong>strongly encouraged</strong>.
+        </div>
+        <div class="banner-steps">
+          <span class="banner-step"><span class="step-num">1</span> Click and drag to select text</span>
+          <span class="banner-step"><span class="step-num">2</span> Type your comment in the popup</span>
+          <span class="banner-step"><span class="step-num">3</span> Your highlight is saved below the poem</span>
+        </div>
+      </div>
+      <button class="banner-dismiss" id="banner-dismiss-btn" title="Dismiss">✕</button>
+    </div>
+
+    <div class="poems-grid" id="poems-grid">
+      <!-- Columns injected by JS -->
+    </div>
+
+    <div class="submit-bar">
+      <div>
+        <div class="progress-info" id="progress-info">0 of 25 ratings filled</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+      <button class="btn-submit" id="submit-btn" disabled>Submit Evaluation</button>
+    </div>
+  </div>
+
+  <!-- ══ CONFIRMATION SCREEN ══ -->
+  <div id="confirm-screen">
+    <div class="confirm-card">
+      <div class="confirm-icon">✓</div>
+      <h2>Thank you!</h2>
+      <p>Your evaluation has been recorded. You can continue by evaluating another set of poems (a different poet's
+        style will be loaded).</p>
+      <button class="btn-next" id="next-btn">Evaluate Another Poet →</button>
+    </div>
+  </div>
+
+  <!-- ══ CRITERION POPOVER (JS-positioned, never clips) ══ -->
+  <div id="criterion-popover">
+    <strong id="pop-title"></strong>
+    <span id="pop-body"></span>
+    <div class="pop-arrow" id="pop-arrow"></div>
+  </div>
+
+  <!-- ══ ANNOTATION POPUP ══ -->
+  <div id="ann-popup">
+    <p>Add a comment for the highlighted text:</p>
+    <textarea id="ann-input" placeholder="Your observation..."></textarea>
+    <div class="popup-btns">
+      <button id="ann-cancel">Cancel</button>
+      <button id="ann-save">Save</button>
+    </div>
+  </div>
+
+  <script>
+    /* ════════════════════════════════════════════════════════════
+       STATE
+    ════════════════════════════════════════════════════════════ */
+    const CRITERIA = ['fluency', 'coherence', 'relevance', 'creativity', 'style'];
+    const CRITERIA_LABELS = {
+      fluency: 'Fluency',
+      coherence: 'Coherence',
+      relevance: 'Relevance',
+      creativity: 'Creativity',
+      style: 'Style',
+    };
+    const CRITERIA_TIPS = {
+      fluency: 'How naturally and smoothly the poem reads. Does it flow well in Hindi without grammatical awkwardness or unnatural phrasing?',
+      coherence: 'How logically and thematically consistent the poem is. Do the lines and stanzas connect meaningfully?',
+      relevance: 'How well the poem addresses the given prompt or theme. Is the content on-topic and purposeful?',
+      creativity: 'How original, imaginative, and inventive the poem is. Does it use fresh imagery, metaphors, or ideas?',
+      style: 'How faithfully the poem captures the distinctive voice, tone, and literary style of the target poet.',
+    };
+
+    // 6 distinct annotation colours cycled per poem (not globally)
+    const ANN_COLOURS = [
+      { cls: 'ann-c0', bg: '#fff3b0', bd: '#d4b800' },
+      { cls: 'ann-c1', bg: '#d4edff', bd: '#4a9fd4' },
+      { cls: 'ann-c2', bg: '#d4f7e0', bd: '#3aad6a' },
+      { cls: 'ann-c3', bg: '#ffdde8', bd: '#d4517a' },
+      { cls: 'ann-c4', bg: '#ecdcff', bd: '#8b5cd4' },
+      { cls: 'ann-c5', bg: '#ffe8cc', bd: '#d47a20' },
+    ];
+
+    /* ════════════════════════════════════════════════════════════
+       CRITERION POPOVER — viewport-aware, never clips
+    ════════════════════════════════════════════════════════════ */
+    const criterionPopover = document.getElementById('criterion-popover');
+    const popTitle = document.getElementById('pop-title');
+    const popBody = document.getElementById('pop-body');
+    const popArrow = document.getElementById('pop-arrow');
+    const POP_W = 220, POP_PAD = 10;
+
+    document.addEventListener('mouseover', e => {
+      const icon = e.target.closest('.criterion-info');
+      if (!icon) return;
+      const criterion = icon.dataset.criterion;
+      if (!criterion) return;
+
+      popTitle.textContent = CRITERIA_LABELS[criterion];
+      popBody.textContent = CRITERIA_TIPS[criterion];
+      criterionPopover.style.display = 'block';
+
+      const rect = icon.getBoundingClientRect();
+      const pH = criterionPopover.offsetHeight || 90;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // Reset arrow classes
+      popArrow.className = 'pop-arrow';
+
+      // Try above first
+      let top = rect.top - pH - 10;
+      let left = rect.left + rect.width / 2 - POP_W / 2;
+
+      if (top < POP_PAD) {
+        // Not enough room above → show below
+        top = rect.bottom + 10;
+        popArrow.style.left = '50%';
+        popArrow.style.top = '';
+        popArrow.style.bottom = '';
+        popArrow.style.transform = 'translateX(-50%)';
+        popArrow.classList.add('arrow-up');
+        // position arrow at top of popover
+        popArrow.style.top = '-12px';
+        popArrow.style.bottom = '';
+      } else {
+        // Show above
+        popArrow.style.left = '50%';
+        popArrow.style.transform = 'translateX(-50%)';
+        popArrow.classList.add('arrow-down');
+        popArrow.style.top = '';
+        popArrow.style.bottom = '-12px';
+      }
+
+      // Clamp horizontally
+      left = Math.max(POP_PAD, Math.min(left, vw - POP_W - POP_PAD));
+
+      criterionPopover.style.left = left + 'px';
+      criterionPopover.style.top = top + 'px';
+    });
+
+    document.addEventListener('mouseout', e => {
+      if (e.target.closest('.criterion-info') && !e.relatedTarget?.closest('.criterion-info')) {
+        criterionPopover.style.display = 'none';
+      }
+    });
+
+    let evaluator = { name: '', email: '' };
+    let currentArtistId = '';
+    let poems = [];           // [{poem_id, model_label, text}, ...]
+    // ratings[poem_id][criterion] = 1-5 | null
+    let ratings = {};
+    // annotations[poem_id] = [{selected_text, comment, colorIdx}, ...]
+    let annotations = {};
+
+    // Pending annotation state
+    let pendingRange = null;
+    let pendingPoemId = null;
+    let pendingSelectedText = '';  // captured before range is mutated by highlightRange
+    let pendingMark = null;  // array of <mark class="ann-pending"> DOM nodes while popup is open
+
+    /* ════════════════════════════════════════════════════════════
+       IDENTITY
+    ════════════════════════════════════════════════════════════ */
+    const identityScreen = document.getElementById('identity-screen');
+    const evalScreen = document.getElementById('eval-screen');
+    const confirmScreen = document.getElementById('confirm-screen');
+    const inpName = document.getElementById('inp-name');
+    const inpEmail = document.getElementById('inp-email');
+    const startBtn = document.getElementById('start-btn');
+    const changeUserBtn = document.getElementById('change-user-btn');
+    const evalDisplay = document.getElementById('evaluator-display');
+
+    function validateIdentity() {
+      startBtn.disabled = !(inpName.value.trim() && inpEmail.value.trim());
+    }
+    inpName.addEventListener('input', validateIdentity);
+    inpEmail.addEventListener('input', validateIdentity);
+
+    startBtn.addEventListener('click', () => {
+      evaluator.name = inpName.value.trim();
+      evaluator.email = inpEmail.value.trim();
+      localStorage.setItem('evaluator', JSON.stringify(evaluator));
+      showEvalScreen();
+    });
+
+    changeUserBtn.addEventListener('click', () => {
+      showScreen('identity');
+    });
+
+    function showScreen(which) {
+      identityScreen.style.display = 'none';
+      evalScreen.style.display = 'none';
+      confirmScreen.style.display = 'none';
+      if (which === 'identity') { identityScreen.style.display = 'flex'; changeUserBtn.style.display = 'none'; evalDisplay.textContent = ''; }
+      if (which === 'eval') { evalScreen.style.display = 'block'; changeUserBtn.style.display = 'block'; }
+      if (which === 'confirm') { confirmScreen.style.display = 'flex'; }
+    }
+
+    // Restore from localStorage
+    (function init() {
+      const stored = localStorage.getItem('evaluator');
+      if (stored) {
+        try {
+          const e = JSON.parse(stored);
+          if (e.name && e.email) {
+            evaluator = e;
+            inpName.value = e.name;
+            inpEmail.value = e.email;
+            validateIdentity();
+            showEvalScreen();
+            return;
+          }
+        } catch { }
+      }
+      showScreen('identity');
+    })();
+
+    /* ════════════════════════════════════════════════════════════
+       LOAD POEMS
+    ════════════════════════════════════════════════════════════ */
+    async function showEvalScreen() {
+      evalDisplay.textContent = evaluator.name + ' (' + evaluator.email + ')';
+      evalScreen.style.display = 'block';
+      changeUserBtn.style.display = 'block';
+      identityScreen.style.display = 'none';
+      confirmScreen.style.display = 'none';
+
+      await loadPoems();
+    }
+
+    async function loadPoems() {
+      document.getElementById('poems-grid').innerHTML = '<p style="padding:24px;color:var(--muted)">Loading poems…</p>';
+      try {
+        const resp = await fetch('/api/poems');
+        if (!resp.ok) throw new Error('Server error');
+        const data = await resp.json();
+        currentArtistId = data.artist_id;
+        poems = data.poems;
+        document.getElementById('artist-name-display').textContent = data.artist_name;
+        initState();
+        renderPoems();
+      } catch (e) {
+        document.getElementById('poems-grid').innerHTML = '<p style="padding:24px;color:var(--accent)">Failed to load poems. Is the server running?</p>';
+      }
+    }
+
+    function initState() {
+      ratings = {};
+      annotations = {};
+      poems.forEach(p => {
+        ratings[p.poem_id] = {};
+        CRITERIA.forEach(c => ratings[p.poem_id][c] = null);
+        annotations[p.poem_id] = [];
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       RENDER
+    ════════════════════════════════════════════════════════════ */
+    function renderPoems() {
+      const grid = document.getElementById('poems-grid');
+      grid.innerHTML = '';
+      poems.forEach((poem, idx) => {
+        const col = document.createElement('div');
+        col.className = 'poem-card';
+        col.dataset.poemId = poem.poem_id;
+
+        col.innerHTML = `
+      <div class="poem-card-header">${poem.model_label}</div>
+      <div class="poem-body" id="body-${poem.poem_id}">${escapeHtml(poem.text)}</div>
+      <div class="ratings-section">
+        <h4>Ratings</h4>
+        ${CRITERIA.map(c => `
+          <div class="rating-row">
+            <span class="label">
+              ${CRITERIA_LABELS[c]}
+              <span class="criterion-info" data-criterion="${c}">i</span>
+            </span>
+            <div class="stars" data-poem="${poem.poem_id}" data-criterion="${c}">
+              ${[1, 2, 3, 4, 5].map(n => `<span class="star" data-val="${n}">★</span>`).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="ann-list" id="annlist-${poem.poem_id}">
+        <div class="ann-list-title" style="display:none">Annotations</div>
+      </div>
+    `;
+        grid.appendChild(col);
+
+        // Star click handlers
+        col.querySelectorAll('.stars').forEach(starsEl => {
+          const poemId = starsEl.dataset.poem;
+          const criterion = starsEl.dataset.criterion;
+          starsEl.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', () => {
+              setRating(poemId, criterion, parseInt(star.dataset.val));
+              renderStars(starsEl, ratings[poemId][criterion]);
+              updateProgress();
+            });
+            star.addEventListener('mouseenter', () => {
+              renderStars(starsEl, parseInt(star.dataset.val), true);
+            });
+            star.addEventListener('mouseleave', () => {
+              renderStars(starsEl, ratings[poemId][criterion]);
+            });
+          });
+        });
+
+        // Text selection for annotations
+        const bodyEl = col.querySelector('.poem-body');
+        bodyEl.addEventListener('mouseup', (e) => handleSelection(e, poem.poem_id));
+      });
+      updateProgress();
+      maybeShowBanner();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function setRating(poemId, criterion, val) {
+      ratings[poemId][criterion] = val;
+    }
+
+    function renderStars(starsEl, val, hovering = false) {
+      starsEl.querySelectorAll('.star').forEach(s => {
+        const n = parseInt(s.dataset.val);
+        s.classList.toggle('on', val != null && n <= val);
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       PROGRESS
+    ════════════════════════════════════════════════════════════ */
+    function updateProgress() {
+      let filled = 0;
+      const total = poems.length * CRITERIA.length; // 5 × 5 = 25
+      poems.forEach(p => {
+        CRITERIA.forEach(c => {
+          if (ratings[p.poem_id][c] !== null) filled++;
+        });
+      });
+      document.getElementById('progress-info').textContent = `${filled} of ${total} ratings filled`;
+      document.getElementById('progress-fill').style.width = ((filled / total) * 100) + '%';
+      document.getElementById('submit-btn').disabled = filled < total;
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       ANNOTATIONS
+    ════════════════════════════════════════════════════════════ */
+    const annPopup = document.getElementById('ann-popup');
+    const annInput = document.getElementById('ann-input');
+    const annSave = document.getElementById('ann-save');
+    const annCancel = document.getElementById('ann-cancel');
+
+    /* ── Pick the next colour index for a poem, cycling through 6 colours ── */
+    function nextColour(poemId) {
+      return annotations[poemId].length % ANN_COLOURS.length;
+    }
+
+    /* Better approach: walk fragment text nodes and wrap each */
+    function highlightRange(range, className, dataAttrs) {
+      const frag = range.extractContents();
+      const createdMarks = [];
+
+      function processNode(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          if (node.textContent === '') return node;
+          const m = document.createElement('mark');
+          m.className = className;
+          Object.entries(dataAttrs).forEach(([k, v]) => m.dataset[k] = v);
+          m.appendChild(node.cloneNode(true));
+          createdMarks.push(m);
+          return m;
+        } else {
+          const clone = node.cloneNode(false);
+          Array.from(node.childNodes).forEach(child => {
+            clone.appendChild(processNode(child));
+          });
+          return clone;
+        }
+      }
+
+      const newFrag = document.createDocumentFragment();
+      Array.from(frag.childNodes).forEach(child => newFrag.appendChild(processNode(child)));
+      range.insertNode(newFrag);
+      return createdMarks;
+    }
+
+    /* ── Handle mouseup on poem body ── */
+    function handleSelection(e, poemId) {
+      // If there's already a pending mark, remove it first (user re-selected)
+      clearPendingMark();
+
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || sel.toString().trim().length === 0) return;
+
+      pendingRange = sel.getRangeAt(0).cloneRange();
+      pendingPoemId = poemId;
+      pendingSelectedText = sel.toString().trim();   // capture NOW before range is mutated
+
+      // Immediately insert a pending (grey dashed) highlight so the evaluator
+      // can see what they've selected even while the popup is open.
+      try {
+        const marks = highlightRange(pendingRange.cloneRange(), 'ann-pending', {});
+        // Keep reference to ALL created mark nodes so we can remove them on cancel
+        pendingMark = marks; // array
+      } catch (err) {
+        pendingMark = null;
+      }
+
+      // Clear native selection so the grey mark is the only visual indicator
+      sel.removeAllRanges();
+
+      // Position popup below the selection rect
+      const rect = pendingRange.getBoundingClientRect();
+      annPopup.style.left = Math.min(rect.left + window.scrollX, window.innerWidth - 280) + 'px';
+      annPopup.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+      annPopup.style.display = 'block';
+      annInput.value = '';
+      setTimeout(() => annInput.focus(), 0);
+    }
+
+    /* ── Remove the pending (grey) highlight marks from the DOM ── */
+    function clearPendingMark() {
+      if (pendingMark && pendingMark.length) {
+        pendingMark.forEach(m => {
+          if (m.parentNode) {
+            const parent = m.parentNode;
+            while (m.firstChild) parent.insertBefore(m.firstChild, m);
+            m.remove();
+            parent.normalize();
+          }
+        });
+      }
+      pendingMark = null;
+    }
+
+    annCancel.addEventListener('click', () => {
+      clearPendingMark();
+      annPopup.style.display = 'none';
+      pendingRange = null;
+      pendingPoemId = null;
+      pendingSelectedText = '';
+    });
+
+    annSave.addEventListener('click', saveAnnotation);
+    annInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveAnnotation(); } });
+
+    function saveAnnotation() {
+      const comment = annInput.value.trim();
+      if (!comment || !pendingRange || !pendingPoemId) {
+        // No comment — cancel and remove pending highlight
+        clearPendingMark();
+        annPopup.style.display = 'none';
+        pendingRange = null; pendingPoemId = null;
+        return;
+      }
+
+      const selectedText = pendingSelectedText;
+      const colourIdx = nextColour(pendingPoemId);
+
+      // Replace the grey pending marks with the proper colour marks.
+      // The pending marks already sit in the DOM at the right place.
+      // Simply swap their class and add data attributes.
+      if (pendingMark && pendingMark.length) {
+        pendingMark.forEach(m => {
+          m.className = `ann-highlight ann-c${colourIdx}`;
+          m.dataset.comment = comment;
+          m.dataset.colourIdx = colourIdx;
+        });
+        pendingMark = null;
+      } else {
+        // Fallback: try a fresh highlight at the stored range
+        try {
+          highlightRange(pendingRange.cloneRange(), `ann-highlight ann-c${colourIdx}`, {
+            comment, colourIdx: String(colourIdx),
+          });
+        } catch (err) { }
+      }
+
+      annotations[pendingPoemId].push({ selected_text: selectedText, comment, colourIdx });
+      localStorage.setItem('has_annotated', '1');
+      renderAnnotationList(pendingPoemId);
+
+      annPopup.style.display = 'none';
+      pendingRange = null;
+      pendingPoemId = null;
+      pendingSelectedText = '';
+    }
+
+    function renderAnnotationList(poemId) {
+      const listEl = document.getElementById('annlist-' + poemId);
+      const title = listEl.querySelector('.ann-list-title');
+      const anns = annotations[poemId];
+      listEl.querySelectorAll('.ann-item').forEach(el => el.remove());
+      title.style.display = anns.length ? 'block' : 'none';
+      anns.forEach((ann, idx) => {
+        const dotColour = ANN_COLOURS[ann.colourIdx % ANN_COLOURS.length].bd;
+        const item = document.createElement('div');
+        item.className = 'ann-item';
+        item.innerHTML = `
+      <div class="ann-text">
+        <span class="ann-colour-dot" style="background:${dotColour}"></span>"${escapeHtml(ann.selected_text)}"
+      </div>
+      <div class="ann-comment">${escapeHtml(ann.comment)}</div>
+      <button class="ann-delete" title="Remove">✕</button>
+    `;
+        item.querySelector('.ann-delete').addEventListener('click', () => {
+          // Remove all <mark> nodes in the poem body that share this colour AND comment
+          const bodyEl = document.getElementById('body-' + poemId);
+          bodyEl.querySelectorAll(`mark.ann-c${ann.colourIdx}`).forEach(m => {
+            // Only remove marks that match this exact annotation's comment
+            if (m.dataset.comment === ann.comment && m.dataset.colourIdx === String(ann.colourIdx)) {
+              const parent = m.parentNode;
+              while (m.firstChild) parent.insertBefore(m.firstChild, m);
+              m.remove();
+              parent.normalize();
+            }
+          });
+          annotations[poemId].splice(idx, 1);
+          renderAnnotationList(poemId);
+        });
+        listEl.appendChild(item);
+      });
+    }
+
+    // Close popup on outside click → cancel (remove pending highlight)
+    document.addEventListener('mousedown', e => {
+      if (!annPopup.contains(e.target) && annPopup.style.display === 'block') {
+        clearPendingMark();
+        annPopup.style.display = 'none';
+        pendingRange = null; pendingPoemId = null; pendingSelectedText = '';
+      }
+    });
+
+    /* ════════════════════════════════════════════════════════════
+       SUBMIT
+    ════════════════════════════════════════════════════════════ */
+    document.getElementById('submit-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+
+      const evaluations = poems.map(p => ({
+        poem_id: p.poem_id,
+        ratings: { ...ratings[p.poem_id] },
+        annotations: annotations[p.poem_id].map(a => ({ selected_text: a.selected_text, comment: a.comment })),
+      }));
+
+      const payload = {
+        evaluator,
+        artist_id: currentArtistId,
+        evaluations,
+      };
+
+      try {
+        const resp = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!resp.ok) {
+          const err = await resp.json();
+          throw new Error(err.detail || 'Server error');
+        }
+        showScreen('confirm');
+      } catch (e) {
+        alert('Submission failed: ' + e.message);
+        btn.disabled = false;
+        btn.textContent = 'Submit Evaluation';
+      }
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+      showEvalScreen();
+    });
+
+    /* ════════════════════════════════════════════════════════════
+       ANNOTATION BANNER
+    ════════════════════════════════════════════════════════════ */
+    const annBanner = document.getElementById('ann-banner');
+    const bannerDismissBtn = document.getElementById('banner-dismiss-btn');
+
+    function showBanner() {
+      annBanner.style.display = 'flex';
+    }
+
+    function hideBanner() {
+      annBanner.style.display = 'none';
+    }
+
+    // Show banner on every new session load (so evaluators are always reminded)
+    // Only permanently hide it if they explicitly dismiss AND have already made
+    // at least one annotation — otherwise keep showing it.
+    bannerDismissBtn.addEventListener('click', () => {
+      hideBanner();
+      localStorage.setItem('ann_banner_dismissed', '1');
+    });
+
+    // Called after poems are rendered — show banner unless they've dismissed it
+    // AND have used annotations before (i.e. they know what it is)
+    function maybeShowBanner() {
+      const dismissed = localStorage.getItem('ann_banner_dismissed') === '1';
+      const hasAnnotated = localStorage.getItem('has_annotated') === '1';
+      if (dismissed && hasAnnotated) {
+        hideBanner();
+      } else {
+        showBanner();
+      }
+    }
+
+    // Track first-ever annotation use so we know they've discovered the feature
+    const _origSaveAnnotation = saveAnnotation;
+  </script>
+</body>
+
+</html>
