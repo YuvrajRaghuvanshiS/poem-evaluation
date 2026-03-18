@@ -1,7 +1,7 @@
 {
   "artists": [
     {
-      "artist_id": "topic_बचपन_की_गलियाँ",
+      "artist_id": "बचपन_की_गलियाँ",
       "artist_name": "anupam-singh",
       "poem_prompt": "Write a Hindi poem on the topic '🏡 स्मृतिपूर्ण (Reminiscent): बचपन की गलियाँ' in the style of anupam-singh.",
       "poems": [
@@ -33,7 +33,7 @@
       ]
     },
     {
-      "artist_id": "topic_सूनी_राहें",
+      "artist_id": "सूनी_राहें",
       "artist_name": "trilochan",
       "poem_prompt": "Write a Hindi poem on the topic '😔 उदास (Sad): सूनी राहें' in the style of trilochan.",
       "poems": [
@@ -65,7 +65,7 @@
       ]
     },
     {
-      "artist_id": "topic_अधूरी_मोहब्बत",
+      "artist_id": "अधूरी_मोहब्बत",
       "artist_name": "shubham-shrii",
       "poem_prompt": "Write a Hindi poem on the topic '❤️ भावनात्मक (Emotional): अधूरी मोहब्बत' in the style of shubham-shrii.",
       "poems": [
@@ -97,7 +97,7 @@
       ]
     },
     {
-      "artist_id": "topic_आख़िरी_ख़त",
+      "artist_id": "आख़िरी_ख़त",
       "artist_name": "parul-pukhraj",
       "poem_prompt": "Write a Hindi poem on the topic '📜 विरहपूर्ण (Separation): आख़िरी ख़त' in the style of parul-pukhraj.",
       "poems": [
@@ -129,7 +129,7 @@
       ]
     },
     {
-      "artist_id": "topic_रिश्तों_की_डोर",
+      "artist_id": "रिश्तों_की_डोर",
       "artist_name": "padmaja-sharma",
       "poem_prompt": "Write a Hindi poem on the topic '🤝 भावुक (Emotional): रिश्तों की डोर' in the style of padmaja-sharma.",
       "poems": [
@@ -161,7 +161,7 @@
       ]
     },
     {
-      "artist_id": "topic_उम्मीद_की_किरण",
+      "artist_id": "उम्मीद_की_किरण",
       "artist_name": "shashiprakash",
       "poem_prompt": "Write a Hindi poem on the topic '✨ प्रेरणादायक (Inspirational): उम्मीद की किरण' in the style of shashiprakash.",
       "poems": [
@@ -193,7 +193,7 @@
       ]
     },
     {
-      "artist_id": "topic_अजनबी_शहर",
+      "artist_id": "अजनबी_शहर",
       "artist_name": "prabhat-tripathi",
       "poem_prompt": "Write a Hindi poem on the topic '🌆 अकेलापन (Lonely): अजनबी शहर' in the style of prabhat-tripathi.",
       "poems": [
@@ -225,7 +225,7 @@
       ]
     },
     {
-      "artist_id": "topic_बारिश_की_पहली_बूंद",
+      "artist_id": "बारिश_की_पहली_बूंद",
       "artist_name": "gopalkrishna-kaul",
       "poem_prompt": "Write a Hindi poem on the topic '🌿 प्रकृति (Nature): बारिश की पहली बूंद' in the style of gopalkrishna-kaul.",
       "poems": [
@@ -257,7 +257,7 @@
       ]
     },
     {
-      "artist_id": "topic_मिट्टी_की_खुशबू",
+      "artist_id": "मिट्टी_की_खुशबू",
       "artist_name": "vijay-bahadur-singh",
       "poem_prompt": "Write a Hindi poem on the topic '🌾 नॉस्टैल्जिक (Nostalgic): मिट्टी की खुशबू' in the style of vijay-bahadur-singh.",
       "poems": [
@@ -289,7 +289,7 @@
       ]
     },
     {
-      "artist_id": "topic_वक्त_की_रेत",
+      "artist_id": "वक्त_की_रेत",
       "artist_name": "sadanand-shahi",
       "poem_prompt": "Write a Hindi poem on the topic '⏳ दार्शनिक (Reflective): वक्त की रेत' in the style of sadanand-shahi.",
       "poems": [
@@ -321,7 +321,7 @@
       ]
     },
     {
-      "artist_id": "topic_टूटी_हुई_घड़ी_की_कहानी",
+      "artist_id": "टूटी_हुई_घड़ी_की_कहानी",
       "artist_name": "bhawani-singh-1",
       "poem_prompt": "Write a Hindi poem on the topic '🎭 रचनात्मक / अनोखा (Creative): टूटी हुई घड़ी की कहानी' in the style of bhawani-singh-1.",
       "poems": [
@@ -353,7 +353,7 @@
       ]
     },
     {
-      "artist_id": "topic_दिल_की_दस्तक",
+      "artist_id": "दिल_की_दस्तक",
       "artist_name": "pragya-singh",
       "poem_prompt": "Write a Hindi poem on the topic '❤️ रोमांटिक (Romantic): दिल की दस्तक' in the style of pragya-singh.",
       "poems": [
@@ -385,7 +385,7 @@
       ]
     },
     {
-      "artist_id": "topic_नारी_शक्ति",
+      "artist_id": "नारी_शक्ति",
       "artist_name": "jyoti-rita",
       "poem_prompt": "Write a Hindi poem on the topic '🌍 सामाजिक (Social): नारी शक्ति' in the style of jyoti-rita.",
       "poems": [
@@ -417,7 +417,7 @@
       ]
     },
     {
-      "artist_id": "topic_नई_सुबह",
+      "artist_id": "नई_सुबह",
       "artist_name": "shankar-shailendra",
       "poem_prompt": "Write a Hindi poem on the topic '🌄 सकारात्मक (Positive): नई सुबह' in the style of shankar-shailendra.",
       "poems": [
@@ -449,7 +449,7 @@
       ]
     },
     {
-      "artist_id": "topic_चुप्पी_का_बोझ",
+      "artist_id": "चुप्पी_का_बोझ",
       "artist_name": "rakesh-renu",
       "poem_prompt": "Write a Hindi poem on the topic '💔 दर्दभरा (Painful): चुप्पी का बोझ' in the style of rakesh-renu.",
       "poems": [
@@ -481,7 +481,7 @@
       ]
     },
     {
-      "artist_id": "topic_समय_का_चक्र",
+      "artist_id": "समय_का_चक्र",
       "artist_name": "aasit-aditya",
       "poem_prompt": "Write a Hindi poem on the topic '🧠 दार्शनिक (Philosophical): समय का चक्र' in the style of aasit-aditya.",
       "poems": [
@@ -513,7 +513,7 @@
       ]
     },
     {
-      "artist_id": "topic_सपनों_की_उड़ान",
+      "artist_id": "सपनों_की_उड़ान",
       "artist_name": "padmaja-sharma",
       "poem_prompt": "Write a Hindi poem on the topic '🕊️ उत्साहपूर्ण (Energetic): सपनों की उड़ान' in the style of padmaja-sharma.",
       "poems": [
@@ -545,7 +545,7 @@
       ]
     },
     {
-      "artist_id": "topic_टूटी_हुई_पतंग",
+      "artist_id": "टूटी_हुई_पतंग",
       "artist_name": "anil-janvijay",
       "poem_prompt": "Write a Hindi poem on the topic '🎈 निराशाजनक (Hopeless): टूटी हुई पतंग' in the style of anil-janvijay.",
       "poems": [
@@ -577,7 +577,7 @@
       ]
     },
     {
-      "artist_id": "topic_ख्वाबों_का_आसमान",
+      "artist_id": "ख्वाबों_का_आसमान",
       "artist_name": "kanhaiyalal-sethia-1",
       "poem_prompt": "Write a Hindi poem on the topic '🌅 आशावादी (Optimistic): ख्वाबों का आसमान' in the style of kanhaiyalal-sethia-1.",
       "poems": [
@@ -609,7 +609,7 @@
       ]
     },
     {
-      "artist_id": "topic_सच_का_आईना",
+      "artist_id": "सच_का_आईना",
       "artist_name": "rahul-dwivedi",
       "poem_prompt": "Write a Hindi poem on the topic '🪞 गंभीर (Serious): सच का आईना' in the style of rahul-dwivedi.",
       "poems": [
