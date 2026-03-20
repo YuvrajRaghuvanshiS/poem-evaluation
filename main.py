@@ -167,12 +167,23 @@ def submit_evaluation(payload: SubmissionPayload):
             status_code=400, detail="Exactly 5 poem evaluations required."
         )
 
-    required_criteria = {"fluency", "coherence", "relevance", "creativity", "style"}
+    mandatory_criteria = {"fluency", "coherence", "relevance", "creativity"}
+    optional_criteria = {"style"}
+    all_criteria = mandatory_criteria | optional_criteria
+
     for ev in payload.evaluations:
-        if set(ev.ratings.keys()) != required_criteria:
+        provided = set(ev.ratings.keys())
+        missing_mandatory = mandatory_criteria - provided
+        unknown = provided - all_criteria
+        if missing_mandatory:
             raise HTTPException(
                 status_code=400,
-                detail=f"Each poem must be rated on all 5 criteria. Missing for poem {ev.poem_id}.",
+                detail=f"Missing required ratings {missing_mandatory} for poem {ev.poem_id}.",
+            )
+        if unknown:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unknown rating criteria {unknown} for poem {ev.poem_id}.",
             )
         for k, v in ev.ratings.items():
             if not (1 <= v <= 5):

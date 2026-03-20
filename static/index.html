@@ -613,6 +613,37 @@
       transform: translateY(-50%);
     }
 
+    /* Required star and optional tag on rating labels */
+    .required-star {
+      color: var(--accent);
+      font-size: .85rem;
+      font-weight: 700;
+      margin-right: 2px;
+      line-height: 1;
+    }
+
+    .optional-tag {
+      font-size: .67rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1px 6px;
+      margin-left: 3px;
+      letter-spacing: .03em;
+      vertical-align: middle;
+      text-transform: lowercase;
+    }
+
+    .rating-optional .stars .star {
+      color: #c8c0b6;
+    }
+
+    .rating-optional .stars .star.on {
+      color: var(--star-on);
+    }
+
     .stars {
       display: flex;
       gap: 3px;
@@ -930,6 +961,7 @@
        STATE
     ════════════════════════════════════════════════════════════ */
     const CRITERIA = ['fluency', 'coherence', 'relevance', 'creativity', 'style'];
+    const OPTIONAL_CRITERIA = new Set(['style']);   // style is optional — no star, not required for submit
     const CRITERIA_LABELS = {
       fluency: 'Fluency',
       coherence: 'Coherence',
@@ -1146,17 +1178,19 @@
       <div class="poem-body" id="body-${poem.poem_id}">${escapeHtml(poem.text)}</div>
       <div class="ratings-section">
         <h4>Ratings</h4>
-        ${CRITERIA.map(c => `
-          <div class="rating-row">
+        ${CRITERIA.map(c => {
+          const optional = OPTIONAL_CRITERIA.has(c);
+          return `
+          <div class="rating-row${optional ? ' rating-optional' : ''}">
             <span class="label">
-              ${CRITERIA_LABELS[c]}
+              ${optional ? '' : '<span class="required-star" title="Required">*</span>'}${CRITERIA_LABELS[c]}${optional ? ' <span class="optional-tag">optional</span>' : ''}
               <span class="criterion-info" data-criterion="${c}">i</span>
             </span>
             <div class="stars" data-poem="${poem.poem_id}" data-criterion="${c}">
               ${[1, 2, 3, 4, 5].map(n => `<span class="star" data-val="${n}">★</span>`).join('')}
             </div>
-          </div>
-        `).join('')}
+          </div>`;
+        }).join('')}
       </div>
       <div class="ann-list" id="annlist-${poem.poem_id}">
         <div class="ann-list-title" style="display:none">Annotations</div>
@@ -1210,16 +1244,27 @@
        PROGRESS
     ════════════════════════════════════════════════════════════ */
     function updateProgress() {
-      let filled = 0;
-      const total = poems.length * CRITERIA.length; // 5 × 5 = 25
+      const mandatoryCriteria = CRITERIA.filter(c => !OPTIONAL_CRITERIA.has(c));
+      let filledMandatory = 0, filledOptional = 0;
+      const totalMandatory = poems.length * mandatoryCriteria.length;   // 5 × 4 = 20
+      const totalOptional = poems.length * OPTIONAL_CRITERIA.size;     // 5 × 1 = 5
+
       poems.forEach(p => {
-        CRITERIA.forEach(c => {
-          if (ratings[p.poem_id][c] !== null) filled++;
+        mandatoryCriteria.forEach(c => {
+          if (ratings[p.poem_id][c] !== null) filledMandatory++;
+        });
+        OPTIONAL_CRITERIA.forEach(c => {
+          if (ratings[p.poem_id][c] !== null) filledOptional++;
         });
       });
-      document.getElementById('progress-info').textContent = `${filled} of ${total} ratings filled`;
-      document.getElementById('progress-fill').style.width = ((filled / total) * 100) + '%';
-      document.getElementById('submit-btn').disabled = filled < total;
+
+      const filledAll = filledMandatory + filledOptional;
+      const totalAll = totalMandatory + totalOptional;
+      document.getElementById('progress-info').textContent =
+        `${filledMandatory} of ${totalMandatory} required ratings filled` +
+        (filledOptional > 0 ? ` · ${filledOptional}/${totalOptional} optional` : '');
+      document.getElementById('progress-fill').style.width = ((filledAll / totalAll) * 100) + '%';
+      document.getElementById('submit-btn').disabled = filledMandatory < totalMandatory;
     }
 
     /* ════════════════════════════════════════════════════════════
