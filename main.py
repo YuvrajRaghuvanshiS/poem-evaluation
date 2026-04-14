@@ -1,3 +1,18 @@
+"""
+Hindi Poem Evaluator — FastAPI backend
+=======================================
+Submission storage:
+  • If DATABASE_URL env var is set  → PostgreSQL via a connection pool (psycopg3 + psycopg_pool)
+  • Otherwise                       → local ratings.json  (dev / no-DB fallback)
+
+Why a pool?
+  Opening a new TCP+TLS connection to a hosted Postgres (Neon, Supabase, Render)
+  on every request costs 200-800 ms. A ConnectionPool keeps 1-3 connections warm
+  and reuses them, making inserts effectively instantaneous (<10 ms).
+
+poems.json is always read from disk (read-only, no concurrency concern).
+"""
+
 import json
 import os
 import random
@@ -29,7 +44,7 @@ class Annotation(BaseModel):
 
 class PoemEvaluation(BaseModel):
     poem_id: str
-    ratings: dict[str, int]
+    ratings: dict[str, int | None]  # optional criteria may arrive as null
     annotations: list[Annotation] = []
 
 
@@ -172,6 +187,9 @@ def submit_evaluation(payload: SubmissionPayload):
     all_criteria = mandatory_criteria | optional_criteria
 
     for ev in payload.evaluations:
+        # Drop null optional ratings — treat absent and null identically
+        ev.ratings = {k: v for k, v in ev.ratings.items() if v is not None}
+
         provided = set(ev.ratings.keys())
         missing_mandatory = mandatory_criteria - provided
         unknown = provided - all_criteria

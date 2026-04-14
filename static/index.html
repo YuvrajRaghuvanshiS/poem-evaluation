@@ -1463,11 +1463,18 @@
       const btn = document.getElementById('submit-btn');
       btn.disabled = true;
 
-      const evaluations = poems.map(p => ({
-        poem_id: p.poem_id,
-        ratings: { ...ratings[p.poem_id] },
-        annotations: annotations[p.poem_id].map(a => ({ selected_text: a.selected_text, comment: a.comment })),
-      }));
+      const evaluations = poems.map(p => {
+        // Omit optional criteria that were left unrated (null) so they're
+        // absent from the payload rather than sent as null, which Pydantic rejects.
+        const cleanRatings = Object.fromEntries(
+          Object.entries(ratings[p.poem_id]).filter(([_, v]) => v !== null)
+        );
+        return {
+          poem_id: p.poem_id,
+          ratings: cleanRatings,
+          annotations: annotations[p.poem_id].map(a => ({ selected_text: a.selected_text, comment: a.comment })),
+        };
+      });
 
       const payload = {
         evaluator,
