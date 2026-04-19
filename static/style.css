@@ -1,0 +1,845 @@
+/* ── Variables ── */
+:root {
+  --bg: #faf8f4;
+  --surface: #ffffff;
+  --border: #e2ddd6;
+  --text: #1a1714;
+  --muted: #7a736a;
+  --accent: #b5451b;
+  --accent-l: #f5ede9;
+  --gold: #c9943a;
+  --gold-l: #fdf6e8;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  --radius: 10px;
+  --hi-bg: #fff3b0;
+  --hi-border: #e6c847;
+  --star-on: #c9943a;
+  --star-off: #d9d2c8;
+
+  /* Annotation colour palette — 6 distinct colours for overlapping spans */
+  --ann-0-bg: #fff3b0;
+  --ann-0-bd: #d4b800;
+  /* yellow  */
+  --ann-1-bg: #d4edff;
+  --ann-1-bd: #4a9fd4;
+  /* sky     */
+  --ann-2-bg: #d4f7e0;
+  --ann-2-bd: #3aad6a;
+  /* mint    */
+  --ann-3-bg: #ffdde8;
+  --ann-3-bd: #d4517a;
+  /* rose    */
+  --ann-4-bg: #ecdcff;
+  --ann-4-bd: #8b5cd4;
+  /* lavender*/
+  --ann-5-bg: #ffe8cc;
+  --ann-5-bd: #d47a20;
+  /* peach   */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "DM Sans", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+header {
+  background: var(--text);
+  color: #fff;
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+header .logo {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+}
+
+header .sub {
+  font-size: 0.8rem;
+  color: #b0a898;
+  margin-top: 2px;
+}
+
+header .badge {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+header .badge:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+#evaluator-display {
+  font-size: 0.82rem;
+  color: #c8bfb5;
+}
+
+/* ── Identity screen ── */
+#identity-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 64px);
+  padding: 40px 20px;
+}
+
+.identity-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: var(--shadow);
+}
+
+.identity-card h2 {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.7rem;
+  margin-bottom: 6px;
+}
+
+.identity-card p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.field {
+  margin-bottom: 18px;
+}
+
+.field label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.field input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--bg);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-l);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 13px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.1s;
+  margin-top: 4px;
+}
+
+.btn-primary:hover {
+  background: #9a3a16;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  background: #c0b8b0;
+  cursor: not-allowed;
+}
+
+/* ── Eval screen ── */
+#eval-screen {
+  display: none;
+  padding: 28px 24px 80px;
+}
+
+.session-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.session-bar .artist-label,
+.session-bar .poem-label {
+  font-family: "Noto Serif Devanagari", serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* ── Annotation instruction banner ── */
+#ann-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #fffbf0;
+  border: 1.5px solid #e8c96a;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(201, 148, 58, 0.12);
+}
+
+#ann-banner .banner-icon {
+  font-size: 1.7rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+#ann-banner .banner-body {
+  flex: 1;
+}
+
+#ann-banner .banner-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+#ann-banner .banner-desc {
+  font-size: 0.83rem;
+  color: #5a5048;
+  line-height: 1.6;
+}
+
+#ann-banner .banner-desc strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+#ann-banner .banner-steps {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+#ann-banner .banner-step {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8rem;
+  color: #5a5048;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #e8c96a;
+  border-radius: 20px;
+  padding: 5px 12px;
+}
+
+#ann-banner .banner-step .step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+#ann-banner .banner-dismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #b0a07a;
+  font-size: 1.1rem;
+  padding: 2px 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: color 0.15s;
+}
+
+#ann-banner .banner-dismiss:hover {
+  color: var(--accent);
+}
+
+/* ── Poem columns ── */
+.poems-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.poem-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+}
+
+.poem-card-header {
+  background: var(--text);
+  color: #fff;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.poem-body {
+  padding: 16px;
+  font-family: "Tiro Devanagari Hindi", serif;
+  font-size: 0.93rem;
+  line-height: 2;
+  color: var(--text);
+  white-space: pre-wrap;
+  user-select: text;
+  cursor: text;
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.poem-body ::selection {
+  background: var(--hi-bg);
+}
+
+/* Pending selection highlight (before annotation is saved) */
+mark.ann-pending {
+  background: rgba(180, 180, 180, 0.28);
+  border-bottom: 2px dashed #999;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* Saved annotation highlights — one class per colour slot */
+mark.ann-highlight {
+  cursor: pointer;
+  border-radius: 2px;
+  padding: 0 1px;
+  position: relative;
+  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  transition: filter 0.15s;
+}
+
+mark.ann-highlight:hover {
+  filter: brightness(0.93);
+}
+
+mark.ann-c0 {
+  background: var(--ann-0-bg);
+  border-bottom-color: var(--ann-0-bd);
+}
+
+mark.ann-c1 {
+  background: var(--ann-1-bg);
+  border-bottom-color: var(--ann-1-bd);
+}
+
+mark.ann-c2 {
+  background: var(--ann-2-bg);
+  border-bottom-color: var(--ann-2-bd);
+}
+
+mark.ann-c3 {
+  background: var(--ann-3-bg);
+  border-bottom-color: var(--ann-3-bd);
+}
+
+mark.ann-c4 {
+  background: var(--ann-4-bg);
+  border-bottom-color: var(--ann-4-bd);
+}
+
+mark.ann-c5 {
+  background: var(--ann-5-bg);
+  border-bottom-color: var(--ann-5-bd);
+}
+
+/* Colour dot badge shown in annotation list items */
+.ann-colour-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+/* Tooltip on hover for saved highlights */
+mark.ann-highlight:hover::after {
+  content: attr(data-comment);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background: var(--text);
+  color: #fff;
+  font-size: 0.76rem;
+  font-family: "DM Sans", sans-serif;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  max-width: 220px;
+  z-index: 100;
+  line-height: 1.5;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+/* ── Annotation tooltip popup ── */
+#ann-popup {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  padding: 14px;
+  width: 260px;
+}
+
+#ann-popup p {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+#ann-popup textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 0.83rem;
+  font-family: inherit;
+  resize: none;
+  height: 72px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#ann-popup textarea:focus {
+  border-color: var(--accent);
+}
+
+#ann-popup .popup-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+#ann-popup .popup-btns button {
+  flex: 1;
+  padding: 7px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+#ann-save {
+  background: var(--accent);
+  color: #fff;
+}
+
+#ann-save:hover {
+  background: #9a3a16;
+}
+
+#ann-cancel {
+  background: var(--bg);
+  color: var(--muted);
+  border: 1px solid var(--border) !important;
+}
+
+/* ── Ratings section ── */
+.ratings-section {
+  padding: 14px 16px;
+}
+
+.ratings-section h4 {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+
+.rating-row .label {
+  font-size: 0.8rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+}
+
+/* Info icon for rating criteria — tooltip is JS-driven to avoid clipping */
+.criterion-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: var(--border);
+  color: var(--muted);
+  border-radius: 50%;
+  font-size: 0.62rem;
+  font-weight: 700;
+  font-family: "DM Sans", sans-serif;
+  cursor: default;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.criterion-info:hover {
+  background: #c8bfb5;
+}
+
+/* Floating popover — positioned via JS, attached to <body> */
+#criterion-popover {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  background: var(--text);
+  color: #fff;
+  font-size: 0.78rem;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  padding: 10px 13px;
+  border-radius: 8px;
+  width: 220px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.32);
+  pointer-events: none;
+}
+
+#criterion-popover strong {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #f0ebe5;
+}
+
+#criterion-popover .pop-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+}
+
+#criterion-popover .pop-arrow.arrow-down {
+  border-top-color: var(--text);
+  top: 100%;
+}
+
+#criterion-popover .pop-arrow.arrow-up {
+  border-bottom-color: var(--text);
+  bottom: 100%;
+}
+
+#criterion-popover .pop-arrow.arrow-right {
+  border-left-color: var(--text);
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Required star and optional tag on rating labels */
+.required-star {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-right: 2px;
+  line-height: 1;
+}
+
+.optional-tag {
+  font-size: 0.67rem;
+  font-weight: 500;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1px 6px;
+  margin-left: 3px;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+  text-transform: lowercase;
+}
+
+.rating-optional .stars .star {
+  color: #c8c0b6;
+}
+
+.rating-optional .stars .star.on {
+  color: var(--star-on);
+}
+
+.stars {
+  display: flex;
+  gap: 3px;
+}
+
+.star {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  color: var(--star-off);
+  transition:
+    color 0.15s,
+    transform 0.1s;
+  user-select: none;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.star:hover,
+.star.on {
+  color: var(--star-on);
+}
+
+.star:active {
+  transform: scale(0.85);
+}
+
+/* ── Annotations list ── */
+.ann-list {
+  padding: 0 16px 14px;
+}
+
+.ann-list-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.ann-item {
+  background: var(--gold-l);
+  border: 1px solid #e8d5a0;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  position: relative;
+}
+
+.ann-item .ann-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 4px;
+  font-family: "Tiro Devanagari Hindi", serif;
+  font-size: 0.82rem;
+}
+
+.ann-item .ann-comment {
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.ann-delete {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 2px;
+  line-height: 1;
+}
+
+.ann-delete:hover {
+  color: var(--accent);
+}
+
+/* ── Submit bar ── */
+.submit-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
+  z-index: 200;
+}
+
+.progress-info {
+  font-size: 0.83rem;
+  color: var(--muted);
+  flex: 1;
+}
+
+.progress-bar {
+  width: 200px;
+  height: 5px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width 0.3s;
+  width: 0%;
+}
+
+.btn-submit {
+  padding: 11px 32px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.93rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-submit:disabled {
+  background: #c0b8b0;
+  cursor: not-allowed;
+}
+
+.btn-submit:not(:disabled):hover {
+  background: #9a3a16;
+}
+
+/* ── Confirmation screen ── */
+#confirm-screen {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 64px);
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.confirm-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 52px 48px;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: var(--shadow);
+}
+
+.confirm-icon {
+  font-size: 3.5rem;
+  margin-bottom: 16px;
+}
+
+.confirm-card h2 {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.confirm-card p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.btn-next {
+  padding: 13px 32px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btn-next:hover {
+  background: #9a3a16;
+}
+
+/* ── Responsive: allow horizontal scroll on small screens ── */
+@media (max-width: 1100px) {
+  .poems-grid {
+    grid-template-columns: repeat(5, minmax(260px, 1fr));
+    overflow-x: auto;
+  }
+
+  #eval-screen {
+    overflow-x: auto;
+  }
+}
