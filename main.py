@@ -21,13 +21,25 @@ from datetime import datetime
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 load_dotenv()
 app = FastAPI(title="Hindi Poem Evaluator")
+
+
+@app.middleware("http")
+async def add_csp_header(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Content-Security-Policy"] = (
+        "script-src 'self' https:; "
+        "style-src 'self' https: 'unsafe-inline'; "
+        "font-src 'self' https: data:;"
+    )
+    return response
+
 
 POEMS_FILE = Path("poems.json")
 STATIC_DIR = Path("static")
